@@ -57,5 +57,6 @@ def scrape_events():
         # Event in die Liste packen
         event_str = f"{eventtype};{title};{date};{link}"
         event_list.append(event_str)
-
+    driver.quit()
     return event_list
+

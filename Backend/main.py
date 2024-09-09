@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Annotated
@@ -40,19 +41,30 @@ db_dependency = Annotated[Session, Depends(get_db)]
 def scrape_and_save_to_db():
     event_list = webscraper.scrape_events()  # Webscraping starten und Events sammeln
 
-    # Daten in die PostgreSQL-Datenbank speichern
     db = SessionLocal()
     for event_data in event_list:
-        event_type, title, date, link = event_data.split(";")
+        event_type, title, date_str, link = event_data.split(";")
+        
+        # Handle date parsing
+        try:
+            # Normalize date: first, try to parse the date string
+            if "no date" in date_str.lower():
+                date = None  # Handle missing dates
+            else:
+                # Convert German date format (e.g., "Oktober 03, 2024") to YYYY-MM-DD
+                date = datetime.strptime(date_str, "%B %d, %Y").date()  # Handles German month names
+        except ValueError:
+            date = None  # Handle invalid dates
 
         new_event = models.Event(
             typ=event_type,
             titel=title,
-            datum=date,
+            datum=date,  # Save the parsed date
             beschreibung="Automatisch gescraptes Event",
             link=link
         )
         db.add(new_event)
+
     db.commit()
     db.close()
 
