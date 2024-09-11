@@ -21,7 +21,51 @@
   </div>
   <br>
   <h2>Aktuelle Events zum Thema Process Mining</h2>
-  
+
+    <div class="search-bar-container" 
+    cdkOverlayOrigin 
+    #overlayPosition="cdkOverlayOrigin" 
+    [ngClass]="{ 'opened mat-elevation-z2': overlayOpen()  && recentSearches().length > 0 }">
+      <button mat-icon-button>
+        <mat-icon>search</mat-icon>
+      </button>
+      <input 
+      #searchInput 
+      [value] = "searchTerm()" 
+      placeholder="search my app" 
+      (click)="overlayOpen.set(true)" 
+      (keydown.ENTER)="search(searchInput.value)"
+      />
+      @if (searchTerm()) {
+        <button mat-icon-button class="close-button" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    <ng-template 
+    *ngIf="recentSearches().length > 0"
+    cdkConnectedOverlay 
+    [cdkConnectedOverlayOrigin]="overlayPosition" 
+    [cdkConnectedOverlayOpen]="overlayOpen()" 
+    (overlayOutsideClick)="overlayOpen.set(false)">
+      <div class="overlay-container mat-elevation-z2">
+        <mat-action-list>
+          @for (search of recentSearches(); track search) {
+            <mat-list-item (click)="performSearch(search)">
+              <mat-icon matListItemIcon>history</mat-icon>
+              <h3>{{search}}</h3>
+              <button matListItemMeta mat-icon-button (click)="deleteRecentSearch(search)" (click)='$event.stopPropagation()'>
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-list-item>
+          }
+        </mat-action-list>
+      </div>
+    </ng-template>
+
+
+
 </div>
 
 <!-- Footer -->

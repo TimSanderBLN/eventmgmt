@@ -111,3 +111,51 @@
   color: #333;
   font-family: 'Roboto', sans-serif;
 }
+
+.search-bar-container {
+  padding: 0px 56px 0px 8px;
+  background: #eaf1fb;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+
+  > input {
+    font-size: 1.1rem;
+    outline: none;
+    border: none;
+    background: inherit;
+    min-width: 352px;
+    
+  }
+
+  &.opened {
+    background: white;
+    border-radius: 32px 32px 0px 0px;
+  }
+  .close-button {
+    position: absolute;
+    top: 0;
+    right: 8px;
+  }
+}
+
+
+  
+
+.overlay-container {
+  border-radius: 0px 0px 32px 32px;
+  min-width: 468px;
+  background: white;
+  padding-bottom: 16px;
+}
+
+h3 {
+  font-family: 'Roboto', sans-serif;
+  font-size: small;
+}
+
+.mat-typography h3{
+  margin: 0;
+}
