@@ -22,6 +22,7 @@
   <br>
   <h2>Aktuelle Events zum Thema Process Mining</h2>
 
+  <div class="search-bar-and-datepicker">
     <div class="search-bar-container" 
     cdkOverlayOrigin 
     #overlayPosition="cdkOverlayOrigin" 
@@ -42,7 +43,6 @@
         </button>
       }
     </div>
-
     <ng-template 
     *ngIf="recentSearches().length > 0"
     cdkConnectedOverlay 
@@ -64,9 +64,38 @@
       </div>
     </ng-template>
 
-
-
-</div>
+      <!-- Datepicker -->
+      <div class="datepicker-container">
+        <input 
+          type="date" 
+          class="datepicker-input" 
+          placeholder="Select a date"
+        />
+      </div>
+    </div>
+    <div class="filter-chips">
+      <div class="chip" (click)="toggleChip('alles')" [ngClass]="{'selected': selectedChips.includes('alles')}">
+        <span>alles</span>
+        <button class="close-btn" *ngIf="selectedChips.includes('alles')">✖</button>
+      </div>
+    
+      <div class="chip" (click)="toggleChip('Events')" [ngClass]="{'selected': selectedChips.includes('Events')}">
+        <span>Events</span>
+        <button class="close-btn" *ngIf="selectedChips.includes('Events')">✖</button>
+      </div>
+    
+      <div class="chip" (click)="toggleChip('Webinare')" [ngClass]="{'selected': selectedChips.includes('Webinare')}">
+        <span>Webinare</span>
+        <button class="close-btn" *ngIf="selectedChips.includes('Webinare')">✖</button>
+      </div>
+    
+      <div class="chip" (click)="toggleChip('Demo')" [ngClass]="{'selected': selectedChips.includes('Demo')}">
+        <span>Demo</span>
+        <button class="close-btn" *ngIf="selectedChips.includes('Demo')">✖</button>
+      </div>
+    </div>
+    
+  </div>
 
 <!-- Footer -->
 <div class="footer">

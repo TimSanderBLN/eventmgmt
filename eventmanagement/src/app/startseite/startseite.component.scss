@@ -112,28 +112,36 @@
   font-family: 'Roboto', sans-serif;
 }
 
+.search-bar-and-datepicker {
+  display: flex;
+  gap: 16px; /* Abstand zwischen der Suchleiste und dem Datepicker */
+  align-items: center; /* Vertikale Ausrichtung */
+  width: 100%; /* Container über die gesamte Breite strecken */
+  justify-content: flex-start; /* Beide Elemente auf die linke Seite ausrichten */
+}
+
 .search-bar-container {
   padding: 0px 56px 0px 8px;
   background: #eaf1fb;
   border-radius: 32px;
   display: flex;
   align-items: center;
-  position: relative;
-
+  flex-grow: 1;
+  max-width: 468px;
 
   > input {
     font-size: 1.1rem;
     outline: none;
     border: none;
     background: inherit;
-    min-width: 352px;
-    
+    min-width: 100%;
   }
 
   &.opened {
     background: white;
     border-radius: 32px 32px 0px 0px;
   }
+
   .close-button {
     position: absolute;
     top: 0;
@@ -141,14 +149,18 @@
   }
 }
 
+.mat-form-field {
+  flex-shrink: 0; /* Verhindert, dass der Datepicker bei kleinen Bildschirmen zu klein wird */
+  max-width: 300px; /* Setzt die maximale Breite des Datepickers */
+}
 
-  
 
 .overlay-container {
   border-radius: 0px 0px 32px 32px;
-  min-width: 468px;
+  max-width: 600px;
   background: white;
   padding-bottom: 16px;
+  min-width: 532px; /* Gleiche Breite wie die Suchleiste */
 }
 
 h3 {
@@ -158,4 +170,87 @@ h3 {
 
 .mat-typography h3{
   margin: 0;
+}
+
+.datepicker-container {
+  display: flex;
+  align-items: center;
+  background: #a5f3bf; /* Light green background */
+  border-radius: 32px; /* Rundet alle Ecken gleichmäßig ab */
+  padding: 0px 16px;
+  max-width: 180px;
+  min-width: 180px;
+}
+
+.datepicker-input {
+  border: none;
+  background: inherit;
+  outline: none;
+  padding: 12px;
+  font-size: 1.1rem;
+  color: #333;
+  max-width: 180px;
+  min-width: 180px;
+  border-radius: 32px; /* Hier wird sichergestellt, dass auch das Input-Feld abgerundet ist */
+}
+
+.calendar-icon {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 32px; /* Stellt sicher, dass das Icon und sein Container ebenfalls abgerundet sind */
+}
+
+.calendar-icon mat-icon {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 16px; /* Erhöht den Abstand zwischen den Chips */
+  margin-top: 16px; /* Platz oberhalb der Chips */
+
+  .chip {
+    background-color: #1e90ff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* Zentriert den Text */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+
+    &:hover {
+      background-color: #007bff;
+    }
+
+    &.selected {
+      background-color: #007bff;
+    }
+
+    span {
+      padding-right: 8px; /* Platz zwischen Text und X-Button */
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+    }
+  }
 }

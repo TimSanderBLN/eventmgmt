@@ -19,7 +19,7 @@ export class SearchbarHelperService {
   }
 
   addtoRecentSearches(searchTerm: string) {
-    const lowerCaseTerm = searchTerm.toLowerCase();
+    const lowerCaseTerm = searchTerm
     this.recentSearches.set([lowerCaseTerm, ...this.recentSearches().filter((s) => s !== lowerCaseTerm)])
   }
 
