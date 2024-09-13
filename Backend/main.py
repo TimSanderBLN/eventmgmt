@@ -6,8 +6,19 @@ import webscraper
 import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# CORS-Konfiguration hinzufügen
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],  # Erlaube nur diese Origin (Angular App)
+    allow_credentials=True,
+    allow_methods=["*"],  # Erlaube alle HTTP-Methoden
+    allow_headers=["*"],  # Erlaube alle Header
+)
+
 models.Base.metadata.create_all(bind=engine)
 
 class EventBase(BaseModel):

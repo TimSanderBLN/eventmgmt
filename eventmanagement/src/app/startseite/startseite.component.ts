@@ -15,7 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ViewChild, ElementRef } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';  // Import for Chips
 import { MatIconModule } from '@angular/material/icon';    // Import for Icons
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';  // For animations in Material
+import { provideHttpClient } from '@angular/common/http'
+import { EventService } from '../event.service';
 
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -38,7 +39,7 @@ interface AutoCompleteCompleteEvent {
     MatFormFieldModule, 
     MatDatepickerModule,
     MatChipsModule,
-    MatIconModule,
+    MatIconModule, 
     
   ],
   templateUrl: './startseite.component.html',
@@ -152,4 +153,27 @@ toggleChip(chip: string) {
     }
   }
 }
+
+
+
+// Events abrufen mit API und EventService
+
+events: any[] = []; // Array zur Speicherung der Events
+
+  constructor(private eventService: EventService) { }
+
+  ngOnInit(): void {
+    // Events von der API abrufen
+    this.eventService.getEvents().subscribe({
+      next: (data) => {
+        console.log('Daten von API:', data);  // Ausgabe der abgerufenen Daten
+        this.events = data;  // Events speichern
+        console.log('Events geladen: ', this.events);
+        console.log(this.events[1])
+      },
+      error: (error) => {
+        console.error('Fehler beim Abrufen der Events:', error);
+      }
+    });
+  }
 }
