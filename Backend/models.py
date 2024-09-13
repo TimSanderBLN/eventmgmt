@@ -10,6 +10,7 @@ class Event(Base):
     datum = Column(Date, index=True)
     beschreibung = Column(String, index=True)
     link = Column(String, index=True)
+    image_url = Column(String, index=True)
 
 class Benutzer(Base):
     __tablename__ = 'benutzer'

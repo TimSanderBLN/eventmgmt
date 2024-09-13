@@ -54,8 +54,15 @@ def scrape_events():
             date = "no date"
         link = article.find_element(By.CSS_SELECTOR, "a").get_attribute('href')
 
+         # Bildquelle extrahieren (erstes .png-Bild)
+        try:
+            image = article.find_element(By.CSS_SELECTOR, "picture source[srcset*='.png']").get_attribute("srcset")
+            image_url = image.split(",")[0].split(" ")[0]  # Nur die erste URL extrahieren
+        except:
+            image_url = "no image"
+
         # Event in die Liste packen
-        event_str = f"{eventtype};{title};{date};{link}"
+        event_str = f"{eventtype};{title};{date};{link};{image_url}"
         event_list.append(event_str)
     return event_list
 

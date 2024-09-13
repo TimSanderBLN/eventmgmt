@@ -231,13 +231,14 @@ h3 {
     transition: background-color 0.3s ease;
     font-family: 'Roboto', sans-serif;
     position: relative;
+    min-width: 120px; /* Länge der Chips erhöhen */
 
     &:hover {
       background-color: #007bff;
     }
 
     &.selected {
-      background-color: #007bff;
+      background-color: #0568d3;
     }
 
     span {

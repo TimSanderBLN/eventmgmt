@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Depends
 from pydantic import BaseModel
-from typing import List, Annotated
+from typing import List, Annotated, Optional
 import webscraper
 import models
 from database import engine, SessionLocal
@@ -13,9 +13,10 @@ models.Base.metadata.create_all(bind=engine)
 class EventBase(BaseModel):
     typ: str
     titel: str
-    datum: str
+    datum: Optional[str]  # datum kann nun eine Zeichenkette sein, oder `None`
     beschreibung: str
     link: str
+    image_url: Optional[str]  # image_url kann nun eine Zeichenkette sein, oder `None`
 
 class BenutzerBase(BaseModel):
     vname: str
@@ -30,11 +31,12 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
-    except:
-        print("So ein Mist mann")
-    
+    except Exception as e:
+        print(f"Fehler bei der Datenbankverbindung: {e}")
+        raise e  # Ausnahme erneut werfen, damit FastAPI sie handhaben kann
     finally:
         db.close()
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -43,7 +45,11 @@ def scrape_and_save_to_db():
 
     db = SessionLocal()
     for event_data in event_list:
-        event_type, title, date_str, link = event_data.split(";")
+        event_type, title, date_str, link, image_url = event_data.split(";")
+        
+         # Bereinigen der image_url, um alles nach ".png" zu entfernen
+        if ".png" in image_url:
+            image_url = image_url.split(".png")[0] + ".png"
         
         # Handle date parsing
         try:
@@ -61,19 +67,40 @@ def scrape_and_save_to_db():
             titel=title,
             datum=date,  # Save the parsed date
             beschreibung="Automatisch gescraptes Event",
-            link=link
+            link=link,
+            image_url=image_url  # image_url speichern
         )
         db.add(new_event)
 
     db.commit()
     db.close()
 
+@app.get("/events/", response_model=List[EventBase])
+async def get_all_events(db: db_dependency):
+    events = db.query(models.Event).all()  # Alle Events aus der Datenbank abfragen
+
+    # Konvertiere datum in eine Zeichenkette und setze Standardwert für image_url
+    result = []
+    for event in events:
+        result.append({
+            "typ": event.typ,
+            "titel": event.titel,
+            "datum": event.datum.isoformat() if event.datum else None,  # `datum` als ISO-String
+            "beschreibung": event.beschreibung,
+            "link": event.link,
+            "image_url": event.image_url if event.image_url else ""  # Standardwert für image_url
+        })
+
+    return result
+
 @app.post("/event/")
 async def create_event(event: EventBase, db: db_dependency):
-    db_event = models.Event(typ=event.typ, titel=event.titel, datum=event.datum, beschreibung=event.beschreibung, link=event.link)
+    db_event = models.Event(typ=event.typ, titel=event.titel, datum=event.datum, beschreibung=event.beschreibung, link=event.link,
+        image_url=event.image_url)
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+    webscraper.driver_quit()
 
 @app.post("/scrape-events")
 async def scrape_events(background_tasks: BackgroundTasks):
