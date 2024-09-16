@@ -51,6 +51,9 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
+def event_exists_in_db(db: Session, title: str, link: str) -> bool:
+    return db.query(models.Event).filter(models.Event.titel == title, models.Event.link == link).first() is not None
+
 def scrape_and_save_to_db():
     event_list = webscraper.scrape_events()  # Webscraping starten und Events sammeln
     
@@ -86,6 +89,11 @@ def scrape_and_save_to_db():
                 date = datetime.strptime(date_str, "%B %d, %Y").date()  # Handles German month names
         except ValueError:
             date = None  # Handle invalid dates
+        
+         # Überprüfen, ob das Event bereits in der Datenbank vorhanden ist
+        if event_exists_in_db(db, title, link):
+            print(f"Event '{title}' existiert bereits in der Datenbank. Überspringen...")
+            continue  # Überspringen, wenn das Event bereits existiert
 
 
         new_event = models.Event(
