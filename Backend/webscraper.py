@@ -56,10 +56,16 @@ def scrape_events():
 
          # Bildquelle extrahieren (erstes .png-Bild)
         try:
-            image = article.find_element(By.CSS_SELECTOR, "picture source[srcset*='.png']").get_attribute("srcset")
+        # Suche nach .png, .jpg, .jpeg, .webp und .jfif Bildquellen
+            image = article.find_element(By.CSS_SELECTOR, "picture source[srcset*='.png'], picture source[srcset*='.jpg'], picture source[srcset*='.jpeg'], picture source[srcset*='.webp'], picture source[srcset*='.jfif']").get_attribute("srcset")
             image_url = image.split(",")[0].split(" ")[0]  # Nur die erste URL extrahieren
         except:
-            image_url = "no image"
+            try:
+            # Fallback: Versuche das Bild aus einem <img>-Tag zu holen
+                image_url = article.find_element(By.CSS_SELECTOR, "img").get_attribute("src")
+            except:
+                image_url = "no image"
+
 
         # Event in die Liste packen
         event_str = f"{eventtype};{title};{date};{link};{image_url}"

@@ -166,14 +166,51 @@ events: any[] = []; // Array zur Speicherung der Events
     // Events von der API abrufen
     this.eventService.getEvents().subscribe({
       next: (data) => {
-        console.log('Daten von API:', data);  // Ausgabe der abgerufenen Daten
-        this.events = data;  // Events speichern
-        console.log('Events geladen: ', this.events);
-        console.log(this.events[1])
+        console.log('Daten von API:', data);
+        this.events = data;
+  
+        // Events nach Datum sortieren (nächstes Event zuerst)
+        this.events.sort((a, b) => {
+          const dateA = a.datum ? new Date(a.datum).getTime() : Infinity; // Falls kein Datum, Infinity (größer als alle anderen)
+          const dateB = b.datum ? new Date(b.datum).getTime() : Infinity;
+          return dateA - dateB; // Sortiere aufsteigend nach Datum
+        });
+        
+  
+        console.log('Events nach Datum sortiert:', this.events);
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der Events:', error);
       }
     });
   }
+
+
+  reloadEvents(): void {
+    this.eventService.scrapeEvents().subscribe(
+      response => {
+        console.log('Events successfully scraped:', response);
+        // Optional: Events nach Scraping neu laden
+        this.eventService.getEvents().subscribe({
+          next: (data) => {
+            console.log('Daten von API:', data);  // Ausgabe der abgerufenen Daten
+            this.events = data;  // Events speichern
+            console.log('Events geladen: ', this.events);
+            console.log(this.events[1])
+          },
+          error: (error) => {
+            console.error('Fehler beim Abrufen der Events:', error);
+          }
+        });
+      },
+      error => {
+        console.error('Error scraping events:', error);
+      }
+    );
+  }
+  
+  navigateToEvent(link: string): void {
+    window.open(link, '_blank');  // Öffnet den Link in einem neuen Tab
+  }
+  
 }

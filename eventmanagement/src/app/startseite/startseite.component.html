@@ -93,9 +93,14 @@
         <span>Demos</span>
         <button class="close-btn" *ngIf="selectedChips.includes('Demo')">✖</button>
       </div>
+      <button (click)="reloadEvents()" class="reload-btn">
+        <mat-icon>refresh</mat-icon>
+        Reload Events
+      </button>
     </div>
+    <br>
      <!-- Events Display -->
-     <div *ngFor="let event of events" class="event-card">
+     <div *ngFor="let event of events" class="event-card" (click)="navigateToEvent(event.link)">
       <div class="event-content">
         <!-- Bildanzeige -->
         <div class="event-image">

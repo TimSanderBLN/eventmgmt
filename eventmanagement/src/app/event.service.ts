@@ -24,5 +24,10 @@ export class EventService {
       return of(result as T);
     };
   }
+
+  scrapeEvents(): Observable<any> {
+    return this.http.post<any>('http://localhost:8000/scrape-events', {});
+  }
+  
   
 }

@@ -53,25 +53,40 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 def scrape_and_save_to_db():
     event_list = webscraper.scrape_events()  # Webscraping starten und Events sammeln
-
+    
     db = SessionLocal()
     for event_data in event_list:
+        print(event_data)
         event_type, title, date_str, link, image_url = event_data.split(";")
         
-         # Bereinigen der image_url, um alles nach ".png" zu entfernen
+        # Bereinigen der image_url, um alles nach ".png" zu entfernen
         if ".png" in image_url:
             image_url = image_url.split(".png")[0] + ".png"
         
+        # Mapping von deutschen zu englischen Monatsnamen
+        german_to_english_months = {
+            "Januar": "January", "Februar": "February", "März": "March", 
+            "April": "April", "Mai": "May", "Juni": "June", 
+            "Juli": "July", "August": "August", "September": "September", 
+            "Oktober": "October", "November": "November", "Dezember": "December"
+        }
+        
+        # Ersetzen des deutschen Monatsnamens durch den englischen
+        for german_month, english_month in german_to_english_months.items():
+            if german_month in date_str:
+                date_str = date_str.replace(german_month, english_month)
+                break
+        
         # Handle date parsing
         try:
-            # Normalize date: first, try to parse the date string
             if "no date" in date_str.lower():
                 date = None  # Handle missing dates
             else:
-                # Convert German date format (e.g., "Oktober 03, 2024") to YYYY-MM-DD
+                # Convert date (e.g., "October 03, 2024") to YYYY-MM-DD
                 date = datetime.strptime(date_str, "%B %d, %Y").date()  # Handles German month names
         except ValueError:
             date = None  # Handle invalid dates
+
 
         new_event = models.Event(
             typ=event_type,
@@ -82,7 +97,7 @@ def scrape_and_save_to_db():
             image_url=image_url  # image_url speichern
         )
         db.add(new_event)
-
+    webscraper.driver_quit()
     db.commit()
     db.close()
 
