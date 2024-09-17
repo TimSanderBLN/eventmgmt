@@ -1,5 +1,5 @@
-import { Component, computed, inject } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { FormControl, FormsModule, NgControl } from '@angular/forms';
 import { MatToolbar } from '@angular/material/toolbar'
 import { MatIconButton } from '@angular/material/button'
 import { MatIcon } from '@angular/material/icon'
@@ -7,7 +7,7 @@ import { OverlayModule } from '@angular/cdk/overlay'
 import { SearchbarHelperService } from '../searchbar-helper.service';
 import { MatDivider } from '@angular/material/divider'
 import { MatListModule } from '@angular/material/list'
-import { NgClass, CommonModule } from '@angular/common';
+import { NgClass, CommonModule, NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -17,6 +17,8 @@ import { MatChipsModule } from '@angular/material/chips';  // Import for Chips
 import { MatIconModule } from '@angular/material/icon';    // Import for Icons
 import { provideHttpClient } from '@angular/common/http'
 import { EventService } from '../event.service';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -40,6 +42,9 @@ interface AutoCompleteCompleteEvent {
     MatDatepickerModule,
     MatChipsModule,
     MatIconModule, 
+    NgComponentOutlet,
+    NgClass,
+   
     
   ],
   templateUrl: './startseite.component.html',
@@ -48,7 +53,19 @@ interface AutoCompleteCompleteEvent {
   changeDetection: ChangeDetectionStrategy.OnPush
   
 })
-export class StartseiteComponent {
+export class StartseiteComponent implements OnInit {
+
+  constructor(private eventService: EventService, private cdr: ChangeDetectorRef) { 
+    
+  }
+
+  ngOnInit() {
+    console.log('Initialisiere Komponente, lade Events...');
+    this.selectedFilter = 'alles';
+    
+    this.loadEvents();
+  }
+  
 
 searchbarHelperService = inject(SearchbarHelperService);
 overlayOpen = this.searchbarHelperService.overlayOpen;
@@ -129,85 +146,87 @@ updateDate(event: any) {
 
 
 // Chips logik
-selectedChips: string[] = []; // Array zum Speichern der ausgewählten Chips
+selectedChips: string[] = ['alles']; // Array zum Speichern der ausgewählten Chips
+
 
 // Methode zum Umschalten eines Chips
 toggleChip(chip: string) {
   if (chip === 'alles') {
-    // Wenn "alles" gewählt wurde, alle anderen Chips zurücksetzen
+  
     this.selectedChips = ['alles'];
   } else {
-    // Entferne "alles" aus den ausgewählten Chips, wenn ein anderer Chip gewählt wird
     const allesIndex = this.selectedChips.indexOf('alles');
     if (allesIndex > -1) {
       this.selectedChips.splice(allesIndex, 1);
     }
-
-    // Wenn der Chip bereits ausgewählt ist, entferne ihn
     const index = this.selectedChips.indexOf(chip);
     if (index > -1) {
       this.selectedChips.splice(index, 1);
     } else {
-      // Füge den Chip zu den ausgewählten Chips hinzu
       this.selectedChips.push(chip);
     }
   }
+
+  // Event-Ladefunktion nach Auswahl eines Chips aufrufen
+  this.loadEvents();
 }
 
-
-
 // Events abrufen mit API und EventService
-
+selectedFilter = 'alles'
 events: any[] = []; // Array zur Speicherung der Events
+isLoading: boolean = false;  // Ladezustand hinzufügen
 
-  constructor(private eventService: EventService) { }
 
-  ngOnInit(): void {
-    // Events von der API abrufen
+loadEvents(): void {
+  this.isLoading = true; // Ladezustand aktivieren
+
+  if (this.selectedFilter === 'alles') {
     this.eventService.getEvents().subscribe({
       next: (data) => {
-        console.log('Daten von API:', data);
+        console.log('Daten von API empfangen:', data);
         this.events = data;
-  
-        // Events nach Datum sortieren (nächstes Event zuerst)
+
+        // Events nach Datum sortieren
         this.events.sort((a, b) => {
-          const dateA = a.datum ? new Date(a.datum).getTime() : Infinity; // Falls kein Datum, Infinity (größer als alle anderen)
+          const dateA = a.datum ? new Date(a.datum).getTime() : Infinity;
           const dateB = b.datum ? new Date(b.datum).getTime() : Infinity;
-          return dateA - dateB; // Sortiere aufsteigend nach Datum
+          return dateA - dateB;
         });
-        
-  
-        console.log('Events nach Datum sortiert:', this.events);
+
+        this.isLoading = false; // Ladezustand deaktivieren
+        this.cdr.detectChanges(); // Change Detection manuell auslösen
+        console.log('Sortierte Events:', this.events);
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der Events:', error);
+        this.isLoading = false; // Ladezustand auch bei Fehler deaktivieren
       }
     });
   }
+  console.log('Loaded events:', this.events);
+}
+  
 
 
-  reloadEvents(): void {
-    this.eventService.scrapeEvents().subscribe(
-      response => {
-        console.log('Events successfully scraped:', response);
-        // Optional: Events nach Scraping neu laden
-        this.eventService.getEvents().subscribe({
-          next: (data) => {
-            console.log('Daten von API:', data);  // Ausgabe der abgerufenen Daten
-            this.events = data;  // Events speichern
-            console.log('Events geladen: ', this.events);
-            console.log(this.events[1])
-          },
-          error: (error) => {
-            console.error('Fehler beim Abrufen der Events:', error);
-          }
-        });
-      },
-      error => {
-        console.error('Error scraping events:', error);
-      }
-    );
-  }
+// Funktion, um den Filter zu setzen, wenn ein Chip ausgewählt wird
+onFilterChange(filter: string): void {
+  this.selectedFilter = filter;
+  this.loadEvents();
+}
+
+reloadEvents(): void {
+  this.isLoading = true; // Ladezustand setzen, wenn neu geladen wird
+  this.eventService.scrapeEvents().subscribe({
+    next: (response) => {
+      console.log('Events successfully scraped:', response);
+      this.loadEvents(); // Events neu laden
+    },
+    error: (error) => {
+      console.error('Error scraping events:', error);
+      this.isLoading = false; // Ladezustand deaktivieren, falls Fehler
+    }
+  });
+}
   
   navigateToEvent(link: string): void {
     window.open(link, '_blank');  // Öffnet den Link in einem neuen Tab
