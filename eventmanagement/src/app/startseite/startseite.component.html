@@ -70,7 +70,8 @@
         <input
           type="date"
           class="datepicker-input"
-          placeholder="Select a date"
+          placeholder="tt.mm.jjjj"
+          [value]="selectedDate"
           (change)="updateDate($event)" /> <!-- Das (change)-Event aufrufen -->
       </div>
 

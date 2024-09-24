@@ -56,10 +56,15 @@ export class StartseiteComponent implements OnInit {
   ngOnInit() {
     console.log('Initialisiere Komponente, lade Events...');
     this.selectedFilter = 'alles';
-
+  
+    // Aktuelles Datum setzen
+    const today = new Date();
+    this.selectedDate = today.toISOString().substring(0, 10); // Setzt das Datum im Format yyyy-mm-dd
+  
     // Events laden und sicherstellen, dass der Filter direkt angewendet wird
     this.loadEvents();
   }
+  
 
   searchbarHelperService = inject(SearchbarHelperService);
   overlayOpen = this.searchbarHelperService.overlayOpen;
@@ -83,7 +88,8 @@ export class StartseiteComponent implements OnInit {
     this.searchbarHelperService.clearSearch();
   }
 
-  selectedDate: string = '';
+  selectedDate: Date | string = '';
+
 
   // Zugriff auf das versteckte Datepicker-Input
   @ViewChild('hiddenDatepicker')
@@ -121,16 +127,18 @@ export class StartseiteComponent implements OnInit {
   }
 
   // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
-  updateDate(event: any) {
-    const date = new Date(event.target.value);
-    const formattedDate = date.toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-
-    this.selectedDate = formattedDate;
+ // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
+ updateDate(event: any) {
+  const date = new Date(event.target.value);
+  if (!isNaN(date.getTime())) {
+    this.selectedDate = date.toISOString().split('T')[0]; // Formatierung in yyyy-MM-dd
+    this.applyFilter(); // Filter anwenden nach der Auswahl
+  } else {
+    console.log('Ungültiges Datum gewählt');
   }
+}
+
+
 
   // Chips logik
   selectedChips: string[] = ['alles']; // Array zum Speichern der ausgewählten Chips
@@ -190,29 +198,46 @@ export class StartseiteComponent implements OnInit {
     });
   }
 
+  // Filterlogik nach Datum und Chips
   applyFilter(): void {
-    // Zeige alle Events an, wenn 'alles' ausgewählt ist
+    const currentDate = this.selectedDate ? new Date(this.selectedDate) : new Date();
+    console.log("Aktuelles Filterdatum:", currentDate); // Debugging
+  
+    // Zeige alle Events an, wenn 'alles' ausgewählt ist und filtere nach Datum
     if (this.selectedChips.includes('alles')) {
-      this.displayedEvents = [...this.events];  // Alle Events anzeigen
+      this.displayedEvents = this.events.filter(event => {
+        const eventDate = event.datum ? new Date(event.datum) : null;
+        console.log("Event Datum:", eventDate); // Debugging
+  
+        // Zeige Events ohne Datum und Events ab dem aktuellen/ausgewählten Datum
+        return !eventDate || eventDate >= currentDate;
+      });
       return;
     }
-
-    // Filter anwenden, basierend auf ausgewählten Chips
+  
+    // Filter anwenden, basierend auf ausgewählten Chips und Datum
     this.displayedEvents = this.events.filter(event => {
+      const eventDate = event.datum ? new Date(event.datum) : null;
+      console.log("Event Datum:", eventDate); // Debugging
+  
+      // Filtern für Events
       if (this.selectedChips.includes('Events') && event.typ === 'Event') {
-        return true;
+        return !eventDate || eventDate >= currentDate;
       }
+      // Filtern für Webinare
       if (this.selectedChips.includes('Webinare') && 
           (event.typ === 'Webinar' || event.typ === 'On-Demand Webinar')) {
-        return true;
+        return !eventDate || eventDate >= currentDate;
       }
+      // Filtern für Demos
       if (this.selectedChips.includes('Demo') && event.typ === 'Demo') {
-        return true;
+        return !eventDate || eventDate >= currentDate;
       }
+  
       return false;
     });
   }
-
+  
   // Filter wechseln
   onFilterChange(filter: string): void {
     this.selectedFilter = filter;
