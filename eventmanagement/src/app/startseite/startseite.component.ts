@@ -1,12 +1,12 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { FormControl, FormsModule, NgControl } from '@angular/forms';
-import { MatToolbar } from '@angular/material/toolbar'
-import { MatIconButton } from '@angular/material/button'
-import { MatIcon } from '@angular/material/icon'
-import { OverlayModule } from '@angular/cdk/overlay'
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { SearchbarHelperService } from '../searchbar-helper.service';
-import { MatDivider } from '@angular/material/divider'
-import { MatListModule } from '@angular/material/list'
+import { MatDivider } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 import { NgClass, CommonModule, NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -15,10 +15,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ViewChild, ElementRef } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';  // Import for Chips
 import { MatIconModule } from '@angular/material/icon';    // Import for Icons
-import { provideHttpClient } from '@angular/common/http'
+import { provideHttpClient } from '@angular/common/http';
 import { EventService } from '../event.service';
 import { ChangeDetectorRef } from '@angular/core';
-
 
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
@@ -44,143 +43,129 @@ interface AutoCompleteCompleteEvent {
     MatIconModule, 
     NgComponentOutlet,
     NgClass,
-   
-    
   ],
   templateUrl: './startseite.component.html',
   styleUrl: './startseite.component.scss',
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush
-  
 })
 export class StartseiteComponent implements OnInit {
 
-  constructor(private eventService: EventService, private cdr: ChangeDetectorRef) { 
-    
-  }
+  constructor(private eventService: EventService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     console.log('Initialisiere Komponente, lade Events...');
     this.selectedFilter = 'alles';
-    
+
+    // Events laden und sicherstellen, dass der Filter direkt angewendet wird
     this.loadEvents();
   }
-  
 
-searchbarHelperService = inject(SearchbarHelperService);
-overlayOpen = this.searchbarHelperService.overlayOpen;
-recentSearches = computed(() => this.searchbarHelperService.recentSearches().slice(0, 5));
-searchTerm = this.searchbarHelperService.searchTerm
+  searchbarHelperService = inject(SearchbarHelperService);
+  overlayOpen = this.searchbarHelperService.overlayOpen;
+  recentSearches = computed(() => this.searchbarHelperService.recentSearches().slice(0, 5));
+  searchTerm = this.searchbarHelperService.searchTerm;
 
-deleteRecentSearch(searchTerm: string) {
-  this,this.searchbarHelperService.deleteRecentSearch(searchTerm);
-}
-
-search = (searchTerm: string) => {
-  if(!searchTerm) return;
-
-  this.searchbarHelperService.search(searchTerm);
-}
-
-performSearch(searchTerm: string) {
-  this.searchbarHelperService.search(searchTerm);
-}
-
-clearSearch() {
-  this.searchbarHelperService.clearSearch()
-}
-
-
-selectedDate: string = '';
-  
-// Zugriff auf das versteckte Datepicker-Input
-@ViewChild('hiddenDatepicker') 
-hiddenDatepicker!: ElementRef<HTMLInputElement>;
-myControl = new FormControl('');
-
-// Methode zur Validierung der manuellen Datumseingabe
-validateDateInput(event: any) {
-  const value = event.target.value;
-  const regex = /^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[012])\.(\d{4})$/;
-  
-  // Entferne alle nicht-zulässigen Zeichen (nur Zahlen und Punkte)
-  const cleanedValue = value.replace(/[^0-9.]/g, '');
-
-  // Formatierte Eingabe nur zulassen, wenn sie dem regulären Ausdruck entspricht
-  if (cleanedValue.length === 10 && regex.test(cleanedValue)) {
-    this.selectedDate = cleanedValue;
-  } else {
-    // Optional: Feedback für ungültiges Format
-    console.log('Invalid date format');
+  deleteRecentSearch(searchTerm: string) {
+    this.searchbarHelperService.deleteRecentSearch(searchTerm);
   }
 
-  // Aktualisiere das Eingabefeld mit dem bereinigten Wert
-  event.target.value = cleanedValue;
-}
-
-// Methode zum Öffnen des nativen Datepickers
-openCalendar() {
-  if (this.hiddenDatepicker && this.hiddenDatepicker.nativeElement) {
-    console.log('Hidden Datepicker:', this.hiddenDatepicker);
-    
-    // Fokus auf das Input setzen, um den nativen Datepicker zu öffnen
-    this.hiddenDatepicker.nativeElement.focus();
-    this.hiddenDatepicker.nativeElement.click();
-  } else {
-    console.log('Datepicker-Element wurde nicht gefunden.');
+  search = (searchTerm: string) => {
+    if (!searchTerm) return;
+    this.searchbarHelperService.search(searchTerm);
   }
-}
 
-// Methode zur Aktualisierung des Datums aus dem nativen Datepicker
-updateDate(event: any) {
-  const date = new Date(event.target.value);
-  const formattedDate = date.toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+  performSearch(searchTerm: string) {
+    this.searchbarHelperService.search(searchTerm);
+  }
 
-  // Setze das formatierte Datum in das Eingabefeld
-  this.selectedDate = formattedDate;
-}
+  clearSearch() {
+    this.searchbarHelperService.clearSearch();
+  }
 
+  selectedDate: string = '';
 
-// Chips logik
-selectedChips: string[] = ['alles']; // Array zum Speichern der ausgewählten Chips
+  // Zugriff auf das versteckte Datepicker-Input
+  @ViewChild('hiddenDatepicker')
+  hiddenDatepicker!: ElementRef<HTMLInputElement>;
+  myControl = new FormControl('');
 
+  // Methode zur Validierung der manuellen Datumseingabe
+  validateDateInput(event: any) {
+    const value = event.target.value;
+    const regex = /^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[012])\.(\d{4})$/;
 
-// Methode zum Umschalten eines Chips
-toggleChip(chip: string) {
-  if (chip === 'alles') {
-  
-    this.selectedChips = ['alles'];
-  } else {
-    const allesIndex = this.selectedChips.indexOf('alles');
-    if (allesIndex > -1) {
-      this.selectedChips.splice(allesIndex, 1);
-    }
-    const index = this.selectedChips.indexOf(chip);
-    if (index > -1) {
-      this.selectedChips.splice(index, 1);
+    // Entferne alle nicht-zulässigen Zeichen (nur Zahlen und Punkte)
+    const cleanedValue = value.replace(/[^0-9.]/g, '');
+
+    // Formatierte Eingabe nur zulassen, wenn sie dem regulären Ausdruck entspricht
+    if (cleanedValue.length === 10 && regex.test(cleanedValue)) {
+      this.selectedDate = cleanedValue;
     } else {
-      this.selectedChips.push(chip);
+      console.log('Invalid date format');
+    }
+
+    event.target.value = cleanedValue;
+  }
+
+  // Methode zum Öffnen des nativen Datepickers
+  openCalendar() {
+    if (this.hiddenDatepicker && this.hiddenDatepicker.nativeElement) {
+      console.log('Hidden Datepicker:', this.hiddenDatepicker);
+
+      this.hiddenDatepicker.nativeElement.focus();
+      this.hiddenDatepicker.nativeElement.click();
+    } else {
+      console.log('Datepicker-Element wurde nicht gefunden.');
     }
   }
 
-  // Event-Ladefunktion nach Auswahl eines Chips aufrufen
-  this.loadEvents();
-}
+  // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
+  updateDate(event: any) {
+    const date = new Date(event.target.value);
+    const formattedDate = date.toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
 
-// Events abrufen mit API und EventService
-selectedFilter = 'alles'
-events: any[] = []; // Array zur Speicherung der Events
-isLoading: boolean = false;  // Ladezustand hinzufügen
+    this.selectedDate = formattedDate;
+  }
 
+  // Chips logik
+  selectedChips: string[] = ['alles']; // Array zum Speichern der ausgewählten Chips
 
-loadEvents(): void {
-  this.isLoading = true; // Ladezustand aktivieren
+  // Methode zum Umschalten eines Chips
+  toggleChip(chip: string) {
+    if (chip === 'alles') {
+      this.selectedChips = ['alles'];
+    } else {
+      const allesIndex = this.selectedChips.indexOf('alles');
+      if (allesIndex > -1) {
+        this.selectedChips.splice(allesIndex, 1);
+      }
+      const index = this.selectedChips.indexOf(chip);
+      if (index > -1) {
+        this.selectedChips.splice(index, 1);
+      } else {
+        this.selectedChips.push(chip);
+      }
+    }
+  
+    // Filter auf die Events anwenden, wenn der Chip gewechselt wird
+    this.applyFilter();
+  }
+  
 
-  if (this.selectedFilter === 'alles') {
+  // Events abrufen mit API und EventService
+  selectedFilter = 'alles';
+  events: any[] = [];
+  displayedEvents: any[] = [];  // Für die gefilterten Events
+  isLoading: boolean = false;
+
+  loadEvents(): void {
+    this.isLoading = true;
+
     this.eventService.getEvents().subscribe({
       next: (data) => {
         console.log('Daten von API empfangen:', data);
@@ -193,43 +178,62 @@ loadEvents(): void {
           return dateA - dateB;
         });
 
-        this.isLoading = false; // Ladezustand deaktivieren
-        this.cdr.detectChanges(); // Change Detection manuell auslösen
+        this.isLoading = false;
+        this.applyFilter();  // Filter anwenden nach dem Laden der Events
+        this.cdr.detectChanges();
         console.log('Sortierte Events:', this.events);
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der Events:', error);
-        this.isLoading = false; // Ladezustand auch bei Fehler deaktivieren
+        this.isLoading = false;
       }
     });
   }
-  console.log('Loaded events:', this.events);
-}
-  
 
-
-// Funktion, um den Filter zu setzen, wenn ein Chip ausgewählt wird
-onFilterChange(filter: string): void {
-  this.selectedFilter = filter;
-  this.loadEvents();
-}
-
-reloadEvents(): void {
-  this.isLoading = true; // Ladezustand setzen, wenn neu geladen wird
-  this.eventService.scrapeEvents().subscribe({
-    next: (response) => {
-      console.log('Events successfully scraped:', response);
-      this.loadEvents(); // Events neu laden
-    },
-    error: (error) => {
-      console.error('Error scraping events:', error);
-      this.isLoading = false; // Ladezustand deaktivieren, falls Fehler
+  applyFilter(): void {
+    // Zeige alle Events an, wenn 'alles' ausgewählt ist
+    if (this.selectedChips.includes('alles')) {
+      this.displayedEvents = [...this.events];  // Alle Events anzeigen
+      return;
     }
-  });
-}
-  
+
+    // Filter anwenden, basierend auf ausgewählten Chips
+    this.displayedEvents = this.events.filter(event => {
+      if (this.selectedChips.includes('Events') && event.typ === 'Event') {
+        return true;
+      }
+      if (this.selectedChips.includes('Webinare') && 
+          (event.typ === 'Webinar' || event.typ === 'On-Demand Webinar')) {
+        return true;
+      }
+      if (this.selectedChips.includes('Demo') && event.typ === 'Demo') {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  // Filter wechseln
+  onFilterChange(filter: string): void {
+    this.selectedFilter = filter;
+    this.loadEvents();
+  }
+
+  reloadEvents(): void {
+    this.isLoading = true;
+    this.eventService.scrapeEvents().subscribe({
+      next: (response) => {
+        console.log('Events successfully scraped:', response);
+        this.loadEvents();
+      },
+      error: (error) => {
+        console.error('Error scraping events:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
   navigateToEvent(link: string): void {
     window.open(link, '_blank');  // Öffnet den Link in einem neuen Tab
   }
-  
 }
