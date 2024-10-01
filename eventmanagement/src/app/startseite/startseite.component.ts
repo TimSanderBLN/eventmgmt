@@ -75,9 +75,21 @@ export class StartseiteComponent implements OnInit {
     this.searchbarHelperService.deleteRecentSearch(searchTerm);
   }
 
-  search = (searchTerm: string) => {
+  search(searchTerm: string) {
     if (!searchTerm) return;
+
+    // Reset datepicker to current date
+    const today = new Date();
+    this.selectedDate = today.toISOString().substring(0, 10);
+
+    // Reset chips to default 'alles'
+    this.selectedChips = ['alles'];
+
+    // Trigger the search in the SearchbarHelperService
     this.searchbarHelperService.search(searchTerm);
+
+    // Apply the search filter to the events
+    this.applyFilter();
   }
 
   performSearch(searchTerm: string) {
@@ -201,39 +213,40 @@ export class StartseiteComponent implements OnInit {
   // Filterlogik nach Datum und Chips
   applyFilter(): void {
     const currentDate = this.selectedDate ? new Date(this.selectedDate) : new Date();
-    console.log("Aktuelles Filterdatum:", currentDate); // Debugging
   
-    // Zeige alle Events an, wenn 'alles' ausgewählt ist und filtere nach Datum
+    // Perform search term check first
+    const searchTerm = this.searchbarHelperService.searchTerm();
+    if (searchTerm) {
+      this.displayedEvents = this.events.filter(event => {
+        // Filter only by title if search term exists
+        return this.searchbarHelperService.matchesSearchTerm(event.titel);
+      });
+      return;
+    }
+
+    // Default filtering logic based on chips and datepicker
     if (this.selectedChips.includes('alles')) {
       this.displayedEvents = this.events.filter(event => {
         const eventDate = event.datum ? new Date(event.datum) : null;
-        console.log("Event Datum:", eventDate); // Debugging
-  
-        // Zeige Events ohne Datum und Events ab dem aktuellen/ausgewählten Datum
         return !eventDate || eventDate >= currentDate;
       });
       return;
     }
-  
-    // Filter anwenden, basierend auf ausgewählten Chips und Datum
+
     this.displayedEvents = this.events.filter(event => {
       const eventDate = event.datum ? new Date(event.datum) : null;
-      console.log("Event Datum:", eventDate); // Debugging
-  
-      // Filtern für Events
+
       if (this.selectedChips.includes('Events') && event.typ === 'Event') {
         return !eventDate || eventDate >= currentDate;
       }
-      // Filtern für Webinare
       if (this.selectedChips.includes('Webinare') && 
           (event.typ === 'Webinar' || event.typ === 'On-Demand Webinar')) {
         return !eventDate || eventDate >= currentDate;
       }
-      // Filtern für Demos
       if (this.selectedChips.includes('Demo') && event.typ === 'Demo') {
         return !eventDate || eventDate >= currentDate;
       }
-  
+
       return false;
     });
   }

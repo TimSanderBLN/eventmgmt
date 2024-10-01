@@ -12,14 +12,14 @@ export class SearchbarHelperService {
   constructor() { }
 
   search(searchTerm: string) {
-    // Perform the search
-    this.searchTerm.set(searchTerm);
+    // Set the search term and trigger the search process
+    this.searchTerm.set(searchTerm.trim().toLowerCase());
     this.overlayOpen.set(false);
     this.addtoRecentSearches(searchTerm);
   }
 
   addtoRecentSearches(searchTerm: string) {
-    const lowerCaseTerm = searchTerm
+    const lowerCaseTerm = searchTerm.toLowerCase();
     this.recentSearches.set([lowerCaseTerm, ...this.recentSearches().filter((s) => s !== lowerCaseTerm)])
   }
 
@@ -27,8 +27,7 @@ export class SearchbarHelperService {
     this.recentSearches.set(this.recentSearches().filter(s => s !== searchTerm));
     window.localStorage.setItem('recentSearches', JSON.stringify(this.recentSearches()));
 
-    if (this.recentSearches.length === 0)
-    {
+    if (this.recentSearches.length === 0) {
       this.overlayOpen.set(false);
     }
   }
@@ -41,7 +40,12 @@ export class SearchbarHelperService {
   clearSearch() {
     this.searchTerm.set('');
     this.overlayOpen.set(true);
+  }
 
+  // New method: Check if a title matches the search term
+  matchesSearchTerm(title: string): boolean {
+    const term = this.searchTerm().toLowerCase();
+    return title.toLowerCase().includes(term);
   }
 }
 
