@@ -260,6 +260,7 @@ h3 {
 
 
 .event-card {
+  position: relative; /* Dies ist wichtig, um die Position des Buttons innerhalb der Karte zu kontrollieren */
   background-color: #f8f8f8;
   border-radius: 8px;
   padding: 16px;
@@ -269,13 +270,13 @@ h3 {
 
   .event-content {
     display: flex;
-    align-items: flex-start; /* Bild und Text linksbündig ausrichten */
+    align-items: flex-start;
   }
 
   .event-image {
     flex-shrink: 0;
-    width: 270px; /* Feste Breite für das Bild */
-    height: 150px; /* Feste Höhe für das Bild */
+    width: 270px;
+    height: 150px;
     margin-right: 16px;
 
     img {
@@ -288,9 +289,9 @@ h3 {
 
   .event-info {
     display: flex;
-    flex-direction: column; /* Inhalt untereinander anzeigen */
-    justify-content: space-between; /* Verteilung von Titel, Beschreibung und Datum */
-    flex-grow: 1; /* Füllt den Platz neben dem Bild */
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
 
     h3 {
       font-size: 18px;
@@ -317,6 +318,25 @@ h3 {
         font-size: 18px;
         color: #333;
       }
+    }
+  }
+
+  /* Button Styling */
+  .save-button {
+    position: absolute;
+    bottom: 16px;  /* Positioniert den Button am unteren Rand der Karte */
+    right: 16px;   /* Positioniert den Button rechts in der Karte */
+    background-color: #a9a9a9;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #808080;
     }
   }
 }

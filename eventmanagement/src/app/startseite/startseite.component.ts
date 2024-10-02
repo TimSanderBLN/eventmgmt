@@ -19,6 +19,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { EventService } from '../event.service';
 import { ChangeDetectorRef } from '@angular/core';
 
+
 interface AutoCompleteCompleteEvent {
   originalEvent: Event;
   query: string;
