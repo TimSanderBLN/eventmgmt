@@ -60,7 +60,7 @@ def scrape_and_save_to_db():
     db = SessionLocal()
     for event_data in event_list:
         print(event_data)
-        event_type, title, date_str, link, image_url = event_data.split(";")
+        event_type, title, date_str, description, link, image_url = event_data.split(";")
         
         # Bereinigen der image_url, um alles nach ".png" zu entfernen
         if ".png" in image_url:
@@ -85,22 +85,19 @@ def scrape_and_save_to_db():
             if "no date" in date_str.lower():
                 date = None  # Handle missing dates
             else:
-                # Convert date (e.g., "October 03, 2024") to YYYY-MM-DD
-                date = datetime.strptime(date_str, "%B %d, %Y").date()  # Handles German month names
+                date = datetime.strptime(date_str, "%B %d, %Y").date()
         except ValueError:
             date = None  # Handle invalid dates
-        
-         # Überprüfen, ob das Event bereits in der Datenbank vorhanden ist
+
         if event_exists_in_db(db, title, link):
             print(f"Event '{title}' existiert bereits in der Datenbank. Überspringen...")
             continue  # Überspringen, wenn das Event bereits existiert
-
 
         new_event = models.Event(
             typ=event_type,
             titel=title,
             datum=date,  # Save the parsed date
-            beschreibung="Automatisch gescraptes Event",
+            beschreibung=description,  # Save the scraped description
             link=link,
             image_url=image_url  # image_url speichern
         )
