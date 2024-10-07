@@ -41,22 +41,22 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  margin-right: 60px; /* Füge diese Zeile hinzu */
+  margin-right: 60px; /* Verschiebt die Gruppe weiter nach links */
 }
 
-.navigation a {
-  text-decoration: none;
-  color: #333;
-  font-size: 18px;
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px; /* Abstand zwischen Icon und Text */
+}
+
+.navigation span {
+  font-size: 16px;
   font-weight: bold;
-  margin-right: 70px;
-  font-family: 'Roboto', sans-serif;
-  transition: color 0.3s ease;
-
-}
-
-.navigation a:hover {
-  color: #007bff;
+  color: #333;
+  margin-left: 8px; /* Optional: zusätzlicher Abstand zwischen Icon und Text */
 }
 
 /* Main Content */
@@ -70,6 +70,7 @@
 .content h2 {
   font-family: 'Roboto', sans-serif;
 }
+
 /* Footer Styling */
 .footer {
   display: flex;
@@ -155,7 +156,6 @@
   max-width: 300px; /* Setzt die maximale Breite des Datepickers */
 }
 
-
 .overlay-container {
   border-radius: 0px 0px 32px 32px;
   max-width: 600px;
@@ -169,7 +169,7 @@ h3 {
   font-size: small;
 }
 
-.mat-typography h3{
+.mat-typography h3 {
   margin: 0;
 }
 
@@ -214,6 +214,7 @@ h3 {
   display: flex;
   gap: 10px;
   margin-top: 20px;
+  margin-bottom: 24px;
 }
 
 .filter-chips {
@@ -258,8 +259,7 @@ h3 {
   }
 }
 
-
-
+/* Event Card */
 .event-card {
   position: relative; /* Dies ist wichtig, um die Position des Buttons innerhalb der Karte zu kontrollieren */
   background-color: #f8f8f8;
@@ -268,77 +268,78 @@ h3 {
   margin-bottom: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  max-height: 140px; /* Reduziert die Größe der Event Card */
+}
 
-  .event-content {
-    display: flex;
-    align-items: flex-start;
+.event-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.event-image {
+  flex-shrink: 0;
+  width: 80px; /* Größe des Event-Bildes stark reduziert */
+  height: 80px; /* Größe des Event-Bildes stark reduziert */
+  margin-right: 16px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+}
+
+.event-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+
+  h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    color: #333;
   }
 
-  .event-image {
-    flex-shrink: 0;
-    width: 270px;
-    height: 150px;
-    margin-right: 16px;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-    }
+  p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #555;
   }
 
-  .event-info {
+  .event-date {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
+    align-items: center;
+    font-size: 14px;
+    color: #000000;
 
-    h3 {
+    mat-icon {
+      padding-top: 5px;
+      margin-right: 4px;
       font-size: 18px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
       color: #333;
     }
-
-    p {
-      margin: 0 0 8px 0;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .event-date {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      color: #000000;
-
-      mat-icon {
-        padding-top: 5px;
-        margin-right: 4px;
-        font-size: 18px;
-        color: #333;
-      }
-    }
   }
+}
 
-  /* Button Styling */
-  .save-button {
-    position: absolute;
-    bottom: 16px;  /* Positioniert den Button am unteren Rand der Karte */
-    right: 16px;   /* Positioniert den Button rechts in der Karte */
-    background-color: #a9a9a9;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 8px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Button Styling */
+.save-button {
+  position: absolute;
+  bottom: 16px;  /* Positioniert den Button am unteren Rand der Karte */
+  right: 16px;   /* Positioniert den Button rechts in der Karte */
+  background-color: #a9a9a9;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 
-    &:hover {
-      background-color: #808080;
-    }
+  &:hover {
+    background-color: #808080;
   }
 }
 
@@ -365,52 +366,14 @@ h3 {
   }
 }
 
-.user-menu-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+.past-event {
+  color: red !important;
+  font-weight: bold; /* Fügt Fett-Schrift hinzu */
 }
 
-.dropdown-menu {
-  position: absolute;
-  top: 100%;  /* Dropdown direkt unter dem Benutzername platzieren */
-  right: 0;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 10px;
-  border-radius: 4px;
-  z-index: 1000;
-  margin-top: 8px;  /* Platz zwischen Benutzername und Dropdown */
+.future-event {
+  color: green !important;
+  font-weight: bold; /* Fügt Fett-Schrift hinzu */
 }
 
-.user-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 10px;
-}
 
-.username {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-}
-
-/* Button im Dropdown anpassen */
-.dropdown-menu button {
-  background-color: #bebebe;
-  color: rgb(0, 0, 0);
-  font-weight: bold;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  transition: background-color 0.3s ease;
-}
-
-.dropdown-menu button:hover {
-  background-color: #efefef;
-}

@@ -9,8 +9,29 @@
   </div>
   
   <div class="navigation">
-    <a href="/login">Login</a>
+    <!-- Benutzeranzeige mit Dropdown -->
+    <ng-container *ngIf="authService.isAuthenticated(); else showLogin">
+      <div class="user-menu-container" 
+           (mouseenter)="showDropdown()" 
+           (mouseleave)="hideDropdown()">
+        <img src="user.png" alt="User Icon" class="user-icon" />
+        <span class="username">{{ authService.getUsername() }}</span>
+
+        <!-- Dropdown Menü mit Logout Option -->
+        <div class="dropdown-menu" *ngIf="isDropdownVisible" 
+             (mouseenter)="showDropdown()" 
+             (mouseleave)="hideDropdown()">
+          <button (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Login Link anzeigen, wenn der Benutzer nicht eingeloggt ist -->
+    <ng-template #showLogin>
+      <a href="/login">Login</a>
+    </ng-template>
   </div>
+
 </div>
 
 <!-- Main Content -->

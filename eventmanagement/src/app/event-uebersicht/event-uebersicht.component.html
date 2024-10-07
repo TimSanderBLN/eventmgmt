@@ -1,0 +1,111 @@
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <a href="/startseite">
+    <img src="logo.png" alt="Logo">
+  </a>
+  </div>
+  
+  <div class="title">
+    Event-Management-App
+  </div>
+  
+  <div class="navigation">
+    <img src="user.png" alt="User Icon" class="user-icon" />
+    <span class="username">{{ currentUser }}</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+  <h2>Gespeicherte Events</h2>
+
+  <!-- Suchleiste und Datepicker -->
+  <div class="search-bar-and-datepicker">
+    <div class="search-bar-container" 
+      cdkOverlayOrigin 
+      #overlayPosition="cdkOverlayOrigin" 
+      [ngClass]="{ 'opened mat-elevation-z2': overlayOpen() && recentSearches().length > 0 }">
+      <button mat-icon-button>
+        <mat-icon>search</mat-icon>
+      </button>
+      <input 
+        #searchInput 
+        [value]="searchTerm()" 
+        placeholder="durchsuche gespeicherte Events" 
+        (click)="overlayOpen.set(true)" 
+        (keydown.ENTER)="search(searchInput.value)"
+      />
+      <button mat-icon-button class="close-button" (click)="clearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Datepicker -->
+    <div class="datepicker-container">
+      <input
+        type="date"
+        class="datepicker-input"
+        [value]="selectedDate"
+        (change)="updateDate($event)" />
+    </div>
+  </div>
+
+  <!-- Filter-Chips -->
+  <div class="filter-chips">
+    <div class="chip" (click)="toggleChip('alles')" [ngClass]="{'selected': selectedChips.includes('alles')}">
+      <span>alles</span>
+      <button class="close-btn" *ngIf="selectedChips.includes('alles')">✖</button>
+    </div>
+  
+    <div class="chip" (click)="toggleChip('Events')" [ngClass]="{'selected': selectedChips.includes('Events')}">
+      <span>Events</span>
+      <button class="close-btn" *ngIf="selectedChips.includes('Events')">✖</button>
+    </div>
+  
+    <div class="chip" (click)="toggleChip('Webinare')" [ngClass]="{'selected': selectedChips.includes('Webinare')}">
+      <span>Webinare</span>
+      <button class="close-btn" *ngIf="selectedChips.includes('Webinare')">✖</button>
+    </div>
+  
+    <div class="chip" (click)="toggleChip('Demo')" [ngClass]="{'selected': selectedChips.includes('Demo')}">
+      <span>Demos</span>
+      <button class="close-btn" *ngIf="selectedChips.includes('Demo')">✖</button>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Events Display -->
+  <div *ngIf="!isLoading">
+    <div *ngIf="displayedEvents.length > 0; else noEvents">
+      <div *ngFor="let event of displayedEvents" class="event-card" (click)="navigateToEvent(event.link)">
+        <div class="event-content">
+          <!-- Bildanzeige -->
+          <div class="event-image">
+            <img [src]="event.image_url ? event.image_url : 'default-image-url.png'" alt="{{ event.titel }}" />
+          </div>
+  
+          <!-- Textinhalt -->
+          <div class="event-info">
+            <h3>{{ event.titel }}</h3>
+            <!-- Status Anzeige -->
+            <p [ngClass]="getEventDateClass(event.datum)">
+              {{ getEventDateText(event.datum) }}
+            </p>
+          </div>
+        </div>
+        <button class="save-button">Nicht mehr speichern</button>
+      </div>
+    </div>
+
+    <ng-template #noEvents>
+      <p>Keinen Eventfilter ausgewählt oder interner Fehler.</p>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-navigation"></div>
+</div>

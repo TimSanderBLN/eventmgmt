@@ -7,7 +7,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { SearchbarHelperService } from '../searchbar-helper.service';
 import { MatDivider } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
-import { NgClass, CommonModule, NgComponentOutlet } from '@angular/common';
+import { NgClass, CommonModule, NgComponentOutlet, formatDate } from '@angular/common';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -21,14 +21,8 @@ import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 
-
-interface AutoCompleteCompleteEvent {
-  originalEvent: Event;
-  query: string;
-}
-
 @Component({
-  selector: 'app-startseite',
+  selector: 'app-event-uebersicht',
   standalone: true,
   imports: [
     MatToolbar,
@@ -47,36 +41,26 @@ interface AutoCompleteCompleteEvent {
     NgComponentOutlet,
     NgClass,
   ],
-  templateUrl: './startseite.component.html',
-  styleUrl: './startseite.component.scss',
-  providers: [provideNativeDateAdapter()],
+  templateUrl: './event-uebersicht.component.html',
+  styleUrl: './event-uebersicht.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StartseiteComponent implements OnInit {
+export class EventUebersichtComponent implements OnInit{
 
-  isDropdownVisible: boolean = false;  // Variable zur Steuerung der Sichtbarkeit des Dropdowns
-  hideDropdownTimeout: any;
-
-  constructor(public authService: AuthService, private router: Router,  private eventService: EventService, private cdr: ChangeDetectorRef) {}
+  currentUser = 'Max Mustermann'; // Beispiel-Benutzername
   
-  showDropdown() {
-    // Entfernt das Timeout, falls der Benutzer wieder in das Dropdown fährt
-    clearTimeout(this.hideDropdownTimeout);
-    this.isDropdownVisible = true;
-  }
-
-  hideDropdown() {
-    // Setzt eine Verzögerung, um das Dropdown langsam verschwinden zu lassen
-    this.hideDropdownTimeout = setTimeout(() => {
-      this.isDropdownVisible = false;
-    }, 100); 
-  }
-
-  logout() {
-    this.authService.logout(); 
-  }
+  constructor(private authService: AuthService,  private router: Router, private eventService: EventService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
+
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);  // Falls der Benutzer nicht eingeloggt ist
+    } else {
+      this.currentUser = this.authService.getUsername();  // Benutzernamen setzen
+    }
+
+    // Ende Authentifizierung
+  
     console.log('Initialisiere Komponente, lade Events...');
     this.selectedFilter = 'alles';
   
@@ -87,10 +71,7 @@ export class StartseiteComponent implements OnInit {
     // Events laden und sicherstellen, dass der Filter direkt angewendet wird
     this.loadEvents();
   }
-
   
-  
-
   searchbarHelperService = inject(SearchbarHelperService);
   overlayOpen = this.searchbarHelperService.overlayOpen;
   recentSearches = computed(() => this.searchbarHelperService.recentSearches().slice(0, 5));
@@ -126,7 +107,6 @@ export class StartseiteComponent implements OnInit {
   }
 
   selectedDate: Date | string = '';
-
 
   // Zugriff auf das versteckte Datepicker-Input
   @ViewChild('hiddenDatepicker')
@@ -164,18 +144,15 @@ export class StartseiteComponent implements OnInit {
   }
 
   // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
- // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
- updateDate(event: any) {
-  const date = new Date(event.target.value);
-  if (!isNaN(date.getTime())) {
-    this.selectedDate = date.toISOString().split('T')[0]; // Formatierung in yyyy-MM-dd
-    this.applyFilter(); // Filter anwenden nach der Auswahl
-  } else {
-    console.log('Ungültiges Datum gewählt');
+  updateDate(event: any) {
+    const date = new Date(event.target.value);
+    if (!isNaN(date.getTime())) {
+      this.selectedDate = date.toISOString().split('T')[0]; // Formatierung in yyyy-MM-dd
+      this.applyFilter(); // Filter anwenden nach der Auswahl
+    } else {
+      console.log('Ungültiges Datum gewählt');
+    }
   }
-}
-
-
 
   // Chips logik
   selectedChips: string[] = ['alles']; // Array zum Speichern der ausgewählten Chips
@@ -200,7 +177,6 @@ export class StartseiteComponent implements OnInit {
     // Filter auf die Events anwenden, wenn der Chip gewechselt wird
     this.applyFilter();
   }
-  
 
   // Events abrufen mit API und EventService
   selectedFilter = 'alles';
@@ -275,12 +251,43 @@ export class StartseiteComponent implements OnInit {
       return false;
     });
   }
+
+  // Textlogik für vergangene oder zukünftige Events
+  getEventDateText(eventDatum: string | null): string {
+    if (!eventDatum) {
+      return 'Kein Datum';
+    }
   
-  // Filter wechseln
-  onFilterChange(filter: string): void {
-    this.selectedFilter = filter;
-    this.loadEvents();
+    const eventDate = new Date(eventDatum);
+    const currentDate = new Date();
+  
+    if (eventDate < currentDate) {
+      return 'Event ist vorbei';
+    } else {
+      return `Event findet am ${eventDate.toLocaleDateString()} statt`;
+    }
   }
+  
+  
+  getEventDateClass(eventDatum: string | null): string {
+    if (!eventDatum) {
+      console.log('Kein Datum für das Event vorhanden:', eventDatum);
+      return ''; // Gib eine leere Klasse zurück, falls kein Datum vorhanden ist
+    }
+  
+    const today = new Date();
+    const eventDate = new Date(eventDatum);
+  
+    if (eventDate < today) {
+      console.log('Event ist vorbei:', eventDatum);
+      return 'past-event'; // Klasse für vergangene Events
+    } else {
+      console.log('Event in der Zukunft:', eventDatum);
+      return 'future-event'; // Klasse für zukünftige Events
+    }
+  }
+  
+  
 
   reloadEvents(): void {
     this.isLoading = true;
