@@ -13,15 +13,21 @@ app = FastAPI()
 # CORS-Konfiguration hinzufügen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Erlaube nur diese Origin (Angular App)
+    allow_origins=[
+        "http://localhost:4200", 
+        "http://localhost:8000", 
+        "http://127.0.0.1:8000",
+        "http://127.0.0.1:4200"
+    ], 
     allow_credentials=True,
-    allow_methods=["*"],  # Erlaube alle HTTP-Methoden
+    allow_methods=["*"],  # Erlaube alle HTTP-Methoden (GET, POST usw.)
     allow_headers=["*"],  # Erlaube alle Header
 )
 
 models.Base.metadata.create_all(bind=engine)
 
 class EventBase(BaseModel):
+    id: int
     typ: str
     titel: str
     datum: Optional[str]  # datum kann nun eine Zeichenkette sein, oder `None`
@@ -34,8 +40,20 @@ class BenutzerBase(BaseModel):
     nname: str
     email: str
 
-class gespeichertesEventBase(BaseModel):
-    zeitstempel: str
+class GespeichertesEventResponse(BaseModel):
+    saved_event_id: int  # ID des gespeicherten Events
+    id: int  # Event-ID
+    typ: str
+    titel: str
+    datum: Optional[str]  # datum kann nun eine Zeichenkette sein, oder `None`
+    beschreibung: str
+    link: str
+    image_url: Optional[str]  # image_url kann eine Zeichenkette sein oder `None`
+
+
+class EventSaveRequest(BaseModel):
+    event_id: int
+    email: str
 
 
 def get_db():
@@ -114,6 +132,7 @@ async def get_all_events(db: db_dependency):
     result = []
     for event in events:
         result.append({
+            "id": event.id,  # Füge die ID hinzu
             "typ": event.typ,
             "titel": event.titel,
             "datum": event.datum.isoformat() if event.datum else None,  # `datum` als ISO-String
@@ -137,6 +156,88 @@ async def create_event(event: EventBase, db: db_dependency):
 async def scrape_events(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrape_and_save_to_db)
     return {"message": "Scraping started in background"}
+
+# API-Endpunkt, um ein Event in "gespeichertesEvent" zu speichern
+@app.post("/save-event/")
+async def save_event(request_data: EventSaveRequest, db: Session = Depends(get_db)):
+    print(request_data)
+    # Benutzer anhand der E-Mail aus der Datenbank suchen
+    benutzer = db.query(models.Benutzer).filter(models.Benutzer.email == request_data.email).first()
+    
+    if benutzer is None:
+        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+
+    # Neues gespeichertes Event erstellen
+    gespeichertes_event = models.gespeichertesEvent(
+        event_id=request_data.event_id,
+        benutzer_id=benutzer.id,
+        zeitstempel=datetime.now(),
+        
+    )
+
+
+    # In der Datenbank speichern
+    db.add(gespeichertes_event)
+    db.commit()
+    
+    return {"message": "Event erfolgreich gespeichert"}
     
 
+@app.get("/get-user/")
+async def get_user(email: str, db: Session = Depends(SessionLocal)):
+    benutzer = db.query(models.Benutzer).filter(models.Benutzer.email == email).first()
     
+    if benutzer is None:
+        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+
+    return {
+        "id": benutzer.id,
+        "vname": benutzer.vname,
+        "nname": benutzer.nname,
+        "email": benutzer.email
+    }
+
+@app.get("/gespeicherte-events/", response_model=List[GespeichertesEventResponse])
+async def get_saved_events(email: str, db: db_dependency):
+    # Benutzer anhand der E-Mail suchen
+    benutzer = db.query(models.Benutzer).filter(models.Benutzer.email == email).first()
+
+    if not benutzer:
+        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+
+    # Gespeicherte Events des Benutzers abfragen
+    gespeicherte_events = db.query(models.gespeichertesEvent).filter_by(benutzer_id=benutzer.id).all()
+
+    # Die zugehörigen Event-Daten laden und die ID des gespeicherten Events zurückgeben
+    events = []
+    for gespeichertes_event in gespeicherte_events:
+        event = db.query(models.Event).filter_by(id=gespeichertes_event.event_id).first()
+        if event:
+            events.append({
+                "saved_event_id": gespeichertes_event.id,  # Die ID des gespeicherten Events
+                "id": event.id,  # Die ID des eigentlichen Events
+                "typ": event.typ,
+                "titel": event.titel,
+                "datum": event.datum.isoformat() if event.datum else None,
+                "beschreibung": event.beschreibung,
+                "link": event.link,
+                "image_url": event.image_url
+            })
+
+    return events
+
+
+
+@app.delete("/delete-event/{saved_event_id}/")
+async def delete_event(saved_event_id: int, db: Session = Depends(get_db)):
+    # Suche das gespeicherte Event anhand der ID des gespeicherten Events
+    gespeichertes_event = db.query(models.gespeichertesEvent).filter(models.gespeichertesEvent.id == saved_event_id).first()
+
+    if gespeichertes_event:
+        # Lösche das gefundene gespeicherte Event
+        db.delete(gespeichertes_event)
+        db.commit()
+        return {"success": True, "message": "Gespeichertes Event erfolgreich gelöscht"}
+    else:
+        raise HTTPException(status_code=404, detail="Gespeichertes Event nicht gefunden")
+

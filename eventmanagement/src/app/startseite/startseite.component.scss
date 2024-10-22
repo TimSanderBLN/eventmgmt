@@ -52,7 +52,6 @@
   margin-right: 70px;
   font-family: 'Roboto', sans-serif;
   transition: color 0.3s ease;
-
 }
 
 .navigation a:hover {
@@ -70,6 +69,7 @@
 .content h2 {
   font-family: 'Roboto', sans-serif;
 }
+
 /* Footer Styling */
 .footer {
   display: flex;
@@ -113,6 +113,7 @@
   font-family: 'Roboto', sans-serif;
 }
 
+/* Search Bar and Datepicker */
 .search-bar-and-datepicker {
   display: flex;
   gap: 16px; /* Abstand zwischen der Suchleiste und dem Datepicker */
@@ -129,32 +130,31 @@
   align-items: center;
   flex-grow: 1;
   max-width: 468px;
+}
 
-  > input {
-    font-size: 1.1rem;
-    outline: none;
-    border: none;
-    background: inherit;
-    min-width: 100%;
-  }
+.search-bar-container input {
+  font-size: 1.1rem;
+  outline: none;
+  border: none;
+  background: inherit;
+  min-width: 100%;
+}
 
-  &.opened {
-    background: white;
-    border-radius: 32px 32px 0px 0px;
-  }
+.search-bar-container.opened {
+  background: white;
+  border-radius: 32px 32px 0px 0px;
+}
 
-  .close-button {
-    position: absolute;
-    top: 0;
-    right: 8px;
-  }
+.search-bar-container .close-button {
+  position: absolute;
+  top: 0;
+  right: 8px;
 }
 
 .mat-form-field {
   flex-shrink: 0; /* Verhindert, dass der Datepicker bei kleinen Bildschirmen zu klein wird */
   max-width: 300px; /* Setzt die maximale Breite des Datepickers */
 }
-
 
 .overlay-container {
   border-radius: 0px 0px 32px 32px;
@@ -167,10 +167,6 @@
 h3 {
   font-family: 'Roboto', sans-serif;
   font-size: small;
-}
-
-.mat-typography h3{
-  margin: 0;
 }
 
 .datepicker-container {
@@ -196,150 +192,129 @@ h3 {
   font-family: 'Roboto', sans-serif;
 }
 
-.calendar-icon {
-  background: none;
-  border: none;
-  outline: none;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 32px; /* Stellt sicher, dass das Icon und sein Container ebenfalls abgerundet sind */
-}
-
-.calendar-icon mat-icon {
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.filter-chips {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
 .filter-chips {
   display: flex;
   gap: 16px; /* Erhöht den Abstand zwischen den Chips */
   margin-top: 16px; /* Platz oberhalb der Chips */
-
-  .chip {
-    background-color: #1e90ff;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center; /* Zentriert den Text */
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-family: 'Roboto', sans-serif;
-    position: relative;
-    min-width: 120px; /* Länge der Chips erhöhen */
-
-    &:hover {
-      background-color: #007bff;
-    }
-
-    &.selected {
-      background-color: #0568d3;
-    }
-
-    span {
-      padding-right: 8px; /* Platz zwischen Text und X-Button */
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      outline: none;
-    }
-  }
 }
 
+.chip {
+  background-color: #1e90ff;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  min-width: 120px; /* Länge der Chips erhöhen */
+}
 
+.chip:hover {
+  background-color: #007bff;
+}
 
+.chip.selected {
+  background-color: #0568d3;
+}
+
+.chip span {
+  padding-right: 8px;
+}
+
+.chip .close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Event Cards */
 .event-card {
-  position: relative; /* Dies ist wichtig, um die Position des Buttons innerhalb der Karte zu kontrollieren */
+  position: relative;
   background-color: #f8f8f8;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+}
 
-  .event-content {
-    display: flex;
-    align-items: flex-start;
-  }
+.event-content {
+  display: flex;
+  align-items: flex-start;
+}
 
-  .event-image {
-    flex-shrink: 0;
-    width: 270px;
-    height: 150px;
-    margin-right: 16px;
+.event-image {
+  flex-shrink: 0;
+  width: 270px;
+  height: 150px;
+  margin-right: 16px;
+}
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-  }
+.event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
-  .event-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
+.event-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
 
-    h3 {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
-      color: #333;
-    }
+.event-info h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: #333;
+}
 
-    p {
-      margin: 0 0 8px 0;
-      font-size: 14px;
-      color: #555;
-    }
+.event-info p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #555;
+}
 
-    .event-date {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      color: #000000;
+.event-date {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #000000;
+}
 
-      mat-icon {
-        padding-top: 5px;
-        margin-right: 4px;
-        font-size: 18px;
-        color: #333;
-      }
-    }
-  }
+.event-date mat-icon {
+  padding-top: 5px;
+  margin-right: 4px;
+  font-size: 18px;
+  color: #333;
+}
 
-  /* Button Styling */
-  .save-button {
-    position: absolute;
-    bottom: 16px;  /* Positioniert den Button am unteren Rand der Karte */
-    right: 16px;   /* Positioniert den Button rechts in der Karte */
-    background-color: #a9a9a9;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 8px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Button Styling */
+.save-button {
+  position: absolute;
+  bottom: 16px;  /* Positioniert den Button am unteren Rand der Karte */
+  right: 16px;   /* Positioniert den Button rechts in der Karte */
+  background-color: #a9a9a9;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-    &:hover {
-      background-color: #808080;
-    }
-  }
+.save-button:hover {
+  background-color: #808080;
 }
 
 .reload-btn {
@@ -355,33 +330,22 @@ h3 {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-left: auto; /* Schiebt den Button ganz nach rechts */
-  
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  mat-icon {
-    font-size: 18px;
-  }
 }
 
+.reload-btn:hover {
+  background-color: #0056b3;
+}
+
+.reload-btn mat-icon {
+  font-size: 18px;
+}
+
+/* User Menu Dropdown */
 .user-menu-container {
   position: relative;
   display: flex;
   align-items: center;
   cursor: pointer;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;  /* Dropdown direkt unter dem Benutzername platzieren */
-  right: 0;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 10px;
-  border-radius: 4px;
-  z-index: 1000;
-  margin-top: 8px;  /* Platz zwischen Benutzername und Dropdown */
 }
 
 .user-icon {
@@ -398,7 +362,18 @@ h3 {
   color: #333;
 }
 
-/* Button im Dropdown anpassen */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  border-radius: 4px;
+  z-index: 1000;
+  margin-top: 8px;  /* Platz zwischen Benutzername und Dropdown */
+}
+
 .dropdown-menu button {
   background-color: #bebebe;
   color: rgb(0, 0, 0);
@@ -409,6 +384,14 @@ h3 {
   cursor: pointer;
   font-family: 'Roboto', sans-serif;
   transition: background-color 0.3s ease;
+  width: 100%; /* Gleiche Breite für beide Buttons */
+  display: block;
+  text-align: left;
+  margin-bottom: 8px; /* Platz zwischen den Buttons */
+}
+
+.dropdown-menu button:last-child {
+  margin-bottom: 0;
 }
 
 .dropdown-menu button:hover {

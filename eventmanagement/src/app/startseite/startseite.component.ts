@@ -15,11 +15,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ViewChild, ElementRef } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';  // Import for Chips
 import { MatIconModule } from '@angular/material/icon';    // Import for Icons
-import { provideHttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, provideHttpClient } from '@angular/common/http';
 import { EventService } from '../event.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 interface AutoCompleteCompleteEvent {
@@ -46,6 +47,7 @@ interface AutoCompleteCompleteEvent {
     MatIconModule, 
     NgComponentOutlet,
     NgClass,
+    MatSnackBarModule
   ],
   templateUrl: './startseite.component.html',
   styleUrl: './startseite.component.scss',
@@ -57,19 +59,61 @@ export class StartseiteComponent implements OnInit {
   isDropdownVisible: boolean = false;  // Variable zur Steuerung der Sichtbarkeit des Dropdowns
   hideDropdownTimeout: any;
 
-  constructor(public authService: AuthService, private router: Router,  private eventService: EventService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    public authService: AuthService, 
+    private router: Router,  
+    private eventService: EventService, 
+    private cdr: ChangeDetectorRef, 
+    private http: HttpClient,
+    private snackBar: MatSnackBar,  // SnackBar für Erfolgsmeldungen
+  ) {}
+
+  navigateToEventUebersicht(): void {
+    this.router.navigate(['/event-uebersicht']);  // Navigiert zur Seite event-uebersicht
+  }
   
+  
+  saveEvent(eventId: number): void {
+    // Überprüfen, ob der Benutzer eingeloggt ist
+    if (!this.authService.isAuthenticated()) {
+      // Benutzer ist nicht eingeloggt, leite zur Login-Seite um
+      this.router.navigate(['/login']);
+    } else {
+      // Benutzer ist eingeloggt, Event speichern
+      const eventData = { event_id: eventId, email: this.authService.getUsername() };  // Beispiel
+
+      this.eventService.saveEvent(eventData).subscribe({
+        next: (response) => {
+          // Erfolgsmeldung mit SnackBar anzeigen
+          this.snackBar.open('Event erfolgreich gespeichert!', 'Schließen', {
+            duration: 3000,  // Zeige die SnackBar für 3 Sekunden
+          });
+        },
+        error: (error) => {
+          console.error('Fehler beim Speichern des Events:', error);
+        },
+      });
+    }
+  }
+
   showDropdown() {
     // Entfernt das Timeout, falls der Benutzer wieder in das Dropdown fährt
-    clearTimeout(this.hideDropdownTimeout);
-    this.isDropdownVisible = true;
+    if ( this.isDropdownVisible)
+    {
+      this.isDropdownVisible = false;
+    }
+    else {
+      this.isDropdownVisible = true;
+    }
+
+    
   }
 
   hideDropdown() {
     // Setzt eine Verzögerung, um das Dropdown langsam verschwinden zu lassen
-    this.hideDropdownTimeout = setTimeout(() => {
+    
       this.isDropdownVisible = false;
-    }, 100); 
+   
   }
 
   logout() {

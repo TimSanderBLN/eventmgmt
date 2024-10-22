@@ -9,6 +9,7 @@ import { catchError } from 'rxjs/operators';  // Importiere 'catchError' hier
 export class EventService {
 
   private apiUrl = 'http://localhost:8000/events'; // API-Endpunkt
+  private saveEventUrl = 'http://localhost:8000/save-event/'; // API zum Speichern
 
   constructor(private http: HttpClient) { }
 
@@ -27,6 +28,10 @@ export class EventService {
 
   scrapeEvents(): Observable<any> {
     return this.http.post<any>('http://localhost:8000/scrape-events', {});
+  }
+
+  saveEvent(eventData: { event_id: number, email: string }): Observable<any> {
+    return this.http.post<any>(this.saveEventUrl, eventData);
   }
   
   
