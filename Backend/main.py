@@ -174,8 +174,6 @@ async def save_event(request_data: EventSaveRequest, db: Session = Depends(get_d
         zeitstempel=datetime.now(),
         
     )
-
-
     # In der Datenbank speichern
     db.add(gespeichertes_event)
     db.commit()
@@ -184,7 +182,7 @@ async def save_event(request_data: EventSaveRequest, db: Session = Depends(get_d
     
 
 @app.get("/get-user/")
-async def get_user(email: str, db: Session = Depends(SessionLocal)):
+async def get_user(email: str, db: Session = Depends(get_db)):
     benutzer = db.query(models.Benutzer).filter(models.Benutzer.email == email).first()
     
     if benutzer is None:
@@ -241,3 +239,24 @@ async def delete_event(saved_event_id: int, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="Gespeichertes Event nicht gefunden")
 
+@app.post("/create-user/")
+async def create_user(benutzer: BenutzerBase, db: db_dependency):
+    # Prüfen, ob Benutzer mit der E-Mail bereits existiert
+    existing_user = db.query(models.Benutzer).filter(models.Benutzer.email == benutzer.email).first()
+    
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Benutzer mit dieser E-Mail existiert bereits")
+    
+    # Neuen Benutzer anlegen
+    new_user = models.Benutzer(vname=benutzer.vname, nname=benutzer.nname, email=benutzer.email)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)  # Aktualisieren, um auf das neue Benutzerobjekt zugreifen zu können
+    
+    return {
+        "message": "Benutzer erfolgreich erstellt",
+        "id": new_user.id,
+        "vname": new_user.vname,
+        "nname": new_user.nname,
+        "email": new_user.email
+    }

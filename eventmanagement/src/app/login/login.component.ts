@@ -48,6 +48,7 @@ export class LoginComponent {
 
         if (username) {
           this.authService.login(username);  // Setze den Benutzer als eingeloggt
+          this.authService.checkAndAddNewUser(username);
           this.router.navigate(['/event-uebersicht']);  // Weiterleitung
         }
       },

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MsalService } from '@azure/msal-angular';
 import { AuthenticationResult } from '@azure/msal-browser';
@@ -7,7 +8,41 @@ import { AuthenticationResult } from '@azure/msal-browser';
 })
 export class AuthService {
 
-  constructor(private msalService: MsalService) {}
+  constructor(private msalService: MsalService, private http: HttpClient) {}
+
+  checkAndAddNewUser(email: string) {
+    console.log('wird ausgeführt');
+    const url = 'http://127.0.0.1:8000'; // Endpunkt für das Backend
+    const userCheckUrl = `${url}/get-user?email=${email}`; // URL zum Überprüfen des Benutzers in der Datenbank
+
+    // Überprüfen, ob der Benutzer bereits existiert
+    this.http.get(userCheckUrl).subscribe({
+      next: () => {
+        console.log('Benutzer existiert bereits.');
+      },
+      error: (error) => {
+        if (error.status === 404) {
+          // Benutzer existiert nicht, also neuen Benutzer anlegen
+          const nameParts = email.split('@')[0].split('.');
+          const vname = this.capitalizeFirstLetter(nameParts[0]);
+          const nname = this.capitalizeFirstLetter(nameParts[1]);
+
+          const newUser = { vname: vname, nname: nname, email: email };
+
+          // Neuen Benutzer in der Datenbank speichern
+          this.http.post(`${url}/create-user`, newUser).subscribe(() => {
+            console.log('Neuer Benutzer angelegt:', newUser);
+          }, error => {
+            console.error('Fehler beim Anlegen des Benutzers:', error);
+          });
+        }
+      }
+    });
+}
+    // Funktion, um den ersten Buchstaben eines Strings groß zu machen
+    capitalizeFirstLetter(string: string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
   // Normaler Login (nicht Microsoft Entra ID)
   login(username: string) {
