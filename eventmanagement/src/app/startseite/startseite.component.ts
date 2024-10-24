@@ -116,22 +116,41 @@ export class StartseiteComponent implements OnInit {
    
   }
 
-  logout() {
-    this.authService.logout(); 
-  }
 
+  logout() {
+    this.authService.logout();  // Führt den Logout im AuthService aus
+    
+    // Zeige die Snackbar mit der Meldung "Sie haben sich ausgeloggt."
+    this.snackBar.open('Sie haben sich ausgeloggt.', 'Schließen', {
+      duration: 3000,  // Die Snackbar wird 3 Sekunden lang angezeigt
+    });
+  
+    this.isDropdownVisible = false;  // Dropdown schließen
+    this.cdr.detectChanges();  // UI neu rendern
+  }
+  
+  
+  
+  
+  
+  
   ngOnInit() {
     console.log('Initialisiere Komponente, lade Events...');
+    
+    // Überprüfen, ob der Benutzer eingeloggt ist
+    if (this.authService.isAuthenticated()) {
+      console.log('Benutzer ist eingeloggt:', this.authService.getUsername());
+    } else {
+      console.log('Benutzer ist nicht eingeloggt');
+    }
+  
+    // Lasse alle Events laden
     this.selectedFilter = 'alles';
-  
-    // Aktuelles Datum setzen
     const today = new Date();
-    this.selectedDate = today.toISOString().substring(0, 10); // Setzt das Datum im Format yyyy-mm-dd
-  
-    // Events laden und sicherstellen, dass der Filter direkt angewendet wird
+    this.selectedDate = today.toISOString().substring(0, 10);
     this.loadEvents();
   }
-
+  
   
   
 
