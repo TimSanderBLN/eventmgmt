@@ -89,6 +89,10 @@
           placeholder="tt.mm.jjjj"
           [value]="selectedDate"
           (change)="updateDate($event)" /> <!-- Das (change)-Event aufrufen -->
+          <div class="tooltip">
+            <a class="info">Info</a>
+            <span class="tooltiptext">Wähle ein Datum mit einem Klick auf das Kalender-Icon.</span>
+          </div>
       </div>
 
     </div>
@@ -112,10 +116,17 @@
         <span>Demos</span>
         <button class="close-btn" *ngIf="selectedChips.includes('Demo')">✖</button>
       </div>
+
+      <div class="reload-events-container">
       <button (click)="reloadEvents()" class="reload-btn">
         <mat-icon>refresh</mat-icon>
         Reload Events
       </button>
+      <div class="tooltip">
+        <a class="info">Info</a>
+        <span class="tooltiptext">Klicke auf Reload Events, um neue Events von dem celonis Event Hub zu scrapen.</span>
+      </div>
+    </div>
     </div>
     <br>
      <!-- Events Display -->

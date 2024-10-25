@@ -397,3 +397,91 @@ h3 {
 .dropdown-menu button:hover {
   background-color: #efefef;
 }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  font-size: small;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin: 5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+a.info {
+  vertical-align: bottom;
+  position:relative; /* Anything but static */
+  width: 1.5em;
+  height: 1.5em;
+  text-indent: -9999em;
+  display: inline-block;
+  color: white;
+  font-weight:bold;
+  font-size:1em;
+  line-height:1em;
+  background-color: #91b2d2;
+  margin-left: .25em;
+  -webkit-border-radius:.75em;
+  -moz-border-radius:.75em;
+  border-radius:.75em;
+}
+a.info:hover {
+  background-color:#628cb6;
+  cursor: hand; 
+  cursor: pointer;
+}
+a.info:before {
+  content:"?";
+  position: absolute;
+  top: .25em;
+  left:0;
+  text-indent: 0;
+  display:block;
+  width:1.5em;
+  text-align:center;
+}
+
+.reload-events-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* This aligns the button and tooltip to the far right */
+  cursor: pointer;
+  margin-left: auto; /* This ensures that the container takes up as much space as needed */
+}

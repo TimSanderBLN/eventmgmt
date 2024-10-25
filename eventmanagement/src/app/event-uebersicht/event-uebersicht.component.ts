@@ -59,16 +59,58 @@ export class EventUebersichtComponent implements OnInit{
   recentSearches = computed(() => this.searchbarHelperService.recentSearches().slice(0, 5));
   searchTerm = this.searchbarHelperService.searchTerm;
 
-  selectedDate: Date | string = '';
+  selectedDate: string = '2024-09-01'; // Default date
   selectedChips: string[] = ['alles']; // Für die Filterchips
 
   constructor(
     private gespeicherteEventsService: GespeicherteEventsService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private snackBar: MatSnackBar,
   ) {}
+
+  isDropdownVisible: boolean = false;  // Variable zur Steuerung der Sichtbarkeit des Dropdowns
+  hideDropdownTimeout: any;
+
+  navigateToStartseite(): void {
+    this.router.navigate(['']);  // Navigiert zur Seite event-uebersicht
+  }
+
+  
+  showDropdown() {
+    // Entfernt das Timeout, falls der Benutzer wieder in das Dropdown fährt
+    if ( this.isDropdownVisible)
+    {
+      this.isDropdownVisible = false;
+    }
+    else {
+      this.isDropdownVisible = true;
+    }
+
+    
+  }
+
+  hideDropdown() {
+    // Setzt eine Verzögerung, um das Dropdown langsam verschwinden zu lassen
+    
+      this.isDropdownVisible = false;
+   
+  }
+
+
+  logout() {
+    this.authService.logout();  // Führt den Logout im AuthService aus
+    
+    // Zeige die Snackbar mit der Meldung "Sie haben sich ausgeloggt."
+    this.snackBar.open('Sie haben sich ausgeloggt.', 'Schließen', {
+      duration: 3000,  // Die Snackbar wird 3 Sekunden lang angezeigt
+    });
+    this.router.navigate(['']);
+    this.isDropdownVisible = false;  // Dropdown schließen
+    this.cdr.detectChanges();  // UI neu rendern
+  }
+  
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
@@ -83,6 +125,9 @@ export class EventUebersichtComponent implements OnInit{
   removeEvent(savedEventId: number) {
     this.gespeicherteEventsService.deleteSavedEvent(savedEventId).subscribe(() => {
       this.loadGespeicherteEvents();  // Aktualisiert die Liste der gespeicherten Events
+      this.snackBar.open('Event wurde aus den gespeicherten Events entfernt.', 'Schließen', {
+        duration: 3000,  // Zeige die SnackBar für 3 Sekunden
+      });
     });
   }
   
@@ -222,19 +267,53 @@ export class EventUebersichtComponent implements OnInit{
     this.applyFilter();
   }
 
-  // Datum aktualisieren
-  updateDate(event: any) {
-    const date = new Date(event.target.value);
-    if (!isNaN(date.getTime())) {
-      this.selectedDate = date.toISOString().split('T')[0];
-      this.applyFilter();
+
+  // Zugriff auf das versteckte Datepicker-Input
+  @ViewChild('hiddenDatepicker')
+  hiddenDatepicker!: ElementRef<HTMLInputElement>;
+  myControl = new FormControl('');
+
+  // Methode zur Validierung der manuellen Datumseingabe
+  validateDateInput(event: any) {
+    const value = event.target.value;
+    const regex = /^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[012])\.(\d{4})$/;
+
+    // Entferne alle nicht-zulässigen Zeichen (nur Zahlen und Punkte)
+    const cleanedValue = value.replace(/[^0-9.]/g, '');
+
+    // Formatierte Eingabe nur zulassen, wenn sie dem regulären Ausdruck entspricht
+    if (cleanedValue.length === 10 && regex.test(cleanedValue)) {
+      this.selectedDate = cleanedValue;
     } else {
-      console.log('Ungültiges Datum');
-      this.selectedDate = "01.01.2024";
-      this.applyFilter();
+      console.log('Invalid date format');
+    }
+
+    event.target.value = cleanedValue;
+  }
+
+  // Datum aktualisieren
+  openCalendar() {
+    if (this.hiddenDatepicker && this.hiddenDatepicker.nativeElement) {
+      console.log('Hidden Datepicker:', this.hiddenDatepicker);
+
+      this.hiddenDatepicker.nativeElement.focus();
+      this.hiddenDatepicker.nativeElement.click();
+    } else {
+      console.log('Datepicker-Element wurde nicht gefunden.');
     }
   }
 
+  // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
+ // Methode zur Aktualisierung des Datums aus dem nativen Datepicker
+ updateDate(event: any) {
+  const date = new Date(event.target.value);
+  if (!isNaN(date.getTime())) {
+    this.selectedDate = date.toISOString().split('T')[0]; // Formatierung in yyyy-MM-dd
+    this.applyFilter(); // Filter anwenden nach der Auswahl
+  } else {
+    console.log('Ungültiges Datum gewählt');
+  }
+}
   // Methoden für die Suchleiste
   deleteRecentSearch(searchTerm: string) {
     this.searchbarHelperService.deleteRecentSearch(searchTerm);

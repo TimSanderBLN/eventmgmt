@@ -1,5 +1,4 @@
 /* Header Styling */
-/* Header Styling */
 .header {
   display: flex;
   justify-content: space-between;
@@ -42,22 +41,21 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  margin-right: 60px; /* Verschiebt die Gruppe weiter nach links */
+  margin-right: 60px; /* Füge diese Zeile hinzu */
 }
 
-.user-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 10px; /* Abstand zwischen Icon und Text */
-}
-
-.navigation span {
-  font-size: 16px;
-  font-weight: bold;
+.navigation a {
+  text-decoration: none;
   color: #333;
-  margin-left: 8px; /* Optional: zusätzlicher Abstand zwischen Icon und Text */
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 70px;
+  font-family: 'Roboto', sans-serif;
+  transition: color 0.3s ease;
+}
+
+.navigation a:hover {
+  color: #007bff;
 }
 
 /* Main Content */
@@ -75,7 +73,7 @@
 /* Footer Styling */
 .footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end; /* Align the footer content to the right */
   align-items: center;
   width: 100%;
   position: fixed;
@@ -90,20 +88,25 @@
 
 .footer-navigation {
   display: flex;
-  gap: 40px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
 }
 
-.footer-navigation a {
-  text-decoration: none;
-  color: #333;
-  font-size: 18px;
+.footer-link {
+  font-size: 16px;
   font-weight: bold;
-  font-family: 'Roboto', sans-serif;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+  margin-right: 50px; /* Add some margin to the right */
 }
 
-.footer-navigation a:hover {
-  color: #007bff;
+.footer-link:hover {
+  color: #007bff; /* Change color on hover */
+  text-decoration: underline; /* Add underline on hover */
 }
+
 
 .welcome-text {
   background-color: #f8f8f8;
@@ -173,15 +176,8 @@ h3 {
 .mat-typography h3 {
   margin: 0;
 }
-
-.datepicker-container {
-  display: flex;
-  align-items: center;
-  background: #a5f3bf; /* Light green background */
-  border-radius: 32px; /* Rundet alle Ecken gleichmäßig ab */
-  padding: 0px 16px;
-  max-width: 180px;
-  min-width: 180px;
+.hidden-datepicker {
+  display: none; /* Hide the native datepicker */
 }
 
 .datepicker-input {
@@ -193,9 +189,21 @@ h3 {
   color: #333;
   max-width: 180px;
   min-width: 180px;
-  border-radius: 32px; /* Hier wird sichergestellt, dass auch das Input-Feld abgerundet ist */
+  border-radius: 32px;
   font-family: 'Roboto', sans-serif;
+  cursor: pointer; /* Allows clicking to open the datepicker */
 }
+
+.datepicker-container {
+  display: flex;
+  align-items: center;
+  background: #a5f3bf; /* Light green background */
+  border-radius: 32px; /* Rundet alle Ecken gleichmäßig ab */
+  padding: 0px 16px;
+  max-width: 180px;
+  min-width: 180px;
+}
+
 
 .calendar-icon {
   background: none;
@@ -375,4 +383,151 @@ h3 {
 .future-event {
   color: green !important;
   font-weight: bold; /* Fügt Fett-Schrift hinzu */
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  font-size: small;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin: 5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+a.info {
+  vertical-align: bottom;
+  position:relative; /* Anything but static */
+  width: 1.5em;
+  height: 1.5em;
+  text-indent: -9999em;
+  display: inline-block;
+  color: white;
+  font-weight:bold;
+  font-size:1em;
+  line-height:1em;
+  background-color: #91b2d2;
+  margin-left: .25em;
+  -webkit-border-radius:.75em;
+  -moz-border-radius:.75em;
+  border-radius:.75em;
+}
+a.info:hover {
+  background-color:#628cb6;
+  cursor: hand; 
+  cursor: pointer;
+}
+a.info:before {
+  content:"?";
+  position: absolute;
+  top: .25em;
+  left:0;
+  text-indent: 0;
+  display:block;
+  width:1.5em;
+  text-align:center;
+}
+
+.reload-events-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* This aligns the button and tooltip to the far right */
+  cursor: pointer;
+  margin-left: auto; /* This ensures that the container takes up as much space as needed */
+}
+
+/* User Menu Dropdown */
+.user-menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 50px;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.username {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  border-radius: 4px;
+  z-index: 1000;
+  margin-top: 8px;  /* Platz zwischen Benutzername und Dropdown */
+}
+
+.dropdown-menu button {
+  background-color: #bebebe;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.3s ease;
+  width: 100%; /* Gleiche Breite für beide Buttons */
+  display: block;
+  text-align: left;
+  margin-bottom: 8px; /* Platz zwischen den Buttons */
+}
+
+.dropdown-menu button:last-child {
+  margin-bottom: 0;
+}
+
+.dropdown-menu button:hover {
+  background-color: #efefef;
 }

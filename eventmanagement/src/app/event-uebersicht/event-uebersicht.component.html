@@ -9,10 +9,17 @@
     Event-Management-App
   </div>
   
-  <div class="navigation">
-    <img src="user.png" alt="User Icon" class="user-icon" />
-    <span class="username">{{ currentUser }}</span>
-  </div>
+  <ng-container *ngIf="authService.isAuthenticated();">
+    <div class="user-menu-container">
+      <img src="user.png" alt="User Icon" class="user-icon" />
+      <span class="username" (click)="showDropdown()">{{ authService.getUsername() }}</span>
+      <div class="dropdown-menu" *ngIf="isDropdownVisible">
+        <button (click)="navigateToStartseite()">zur Startseite</button>
+        <button (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </ng-container>
+  
 </div>
 
 <!-- Main Content -->
@@ -45,8 +52,12 @@
       <input
         type="date"
         class="datepicker-input"
-        [value]="selectedDate"
+        [value]="selectedDate || '2024-09-01'"
         (change)="updateDate($event)" />
+        <div class="tooltip">
+          <a class="info">Info</a>
+          <span class="tooltiptext">Wähle ein Datum mit einem Klick auf das Kalender-Icon.</span>
+        </div>
     </div>
   </div>
 
@@ -100,12 +111,16 @@
     </div>
 
     <ng-template #noEvents>
-      <p>Keinen Eventfilter ausgewählt oder interner Fehler.</p>
+      <p>Sie haben noch keine Events gespeichert. Wenn Sie auf die Startseite zurückkehren und dort ein Event speichern, erscheint es hier.</p>
     </ng-template>
   </div>
 </div>
 
 <!-- Footer -->
+<!-- Footer -->
 <div class="footer">
-  <div class="footer-navigation"></div>
+  <div class="footer-navigation">
+    <span class="footer-link" (click)="navigateToStartseite()">zurück zur Startseite</span>
+  </div>
 </div>
+
