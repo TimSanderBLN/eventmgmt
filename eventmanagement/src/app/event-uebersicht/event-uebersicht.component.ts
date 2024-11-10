@@ -232,9 +232,7 @@ export class EventUebersichtComponent implements OnInit{
   search(searchTerm: string) {
     if (!searchTerm) return;
 
-    // Setze das Datum auf das aktuelle zurück
-    const today = new Date();
-    this.selectedDate = today.toISOString().substring(0, 10);
+   
 
     // Setze die Chips auf 'alles' zurück
     this.selectedChips = ['alles'];
